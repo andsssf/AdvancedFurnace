@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "advancedfurnace",
+  "version": "${version}",
+
+  "name": "Advanced Furnace",
+  "description": "advanced furnace",
+  "authors": [
+    "andandsf"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+
+  "license": "MIT",
+  "icon": "assets/advancedfurnace/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.andandsf.advancedfurnace.AdvancedFurnace"
+    ]
+  },
+  "mixins": [
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
