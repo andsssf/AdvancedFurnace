@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "me.andandsf.advancedfurnace.AdvancedFurnace"
+    ],
+    "client": [
+      "me.andandsf.advancedfurnace.AdvancedFurnaceClient"
     ]
   },
   "mixins": [
