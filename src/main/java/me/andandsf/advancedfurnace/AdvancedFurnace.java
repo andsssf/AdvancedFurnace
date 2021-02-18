@@ -31,7 +31,6 @@ public class AdvancedFurnace implements ModInitializer {
 		ADVANCED_FURNACE_BLOCK = Registry.register(Registry.BLOCK, ADVANCED_FURNACE_ID, new AdvancedFurnaceBlock(FabricBlockSettings.copyOf(Blocks.FURNACE)));
 		ADVANCED_FURNACE_ITEM = Registry.register(Registry.ITEM, ADVANCED_FURNACE_ID, new BlockItem(ADVANCED_FURNACE_BLOCK, new Item.Settings().group(ItemGroup.MISC)));
 
-		//The parameter of build at the very end is always null, do not worry about it
 		ADVANCED_FURNACE_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, ADVANCED_FURNACE_ID, BlockEntityType.Builder.create(AdvancedFurnaceBlockEntity::new, ADVANCED_FURNACE_BLOCK).build(null));
 
 		ADVANCED_FURNACE_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(ADVANCED_FURNACE_ID, AdvancedFurnaceScreenHandler::new);
@@ -39,6 +38,6 @@ public class AdvancedFurnace implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("hello!");
+		LOGGER.info("have a nice day!");
 	}
 }
