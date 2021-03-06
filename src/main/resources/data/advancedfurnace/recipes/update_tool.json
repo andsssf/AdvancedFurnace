@@ -1,8 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "$#$",
-    "$#$",
+    "#$#",
+    "$*$",
     "&&&"
   ],
   "key": {
@@ -14,9 +14,12 @@
     },
     "#": {
       "item": "minecraft:iron_bars"
+    },
+    "*": {
+      "tag": "minecraft:logs"
     }
   },
   "result": {
-    "item": "advancedfurnace:advanced_furnace"
+    "item": "advancedfurnace:update_tool"
   }
 }
