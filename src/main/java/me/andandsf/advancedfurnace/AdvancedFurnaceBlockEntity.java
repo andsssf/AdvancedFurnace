@@ -11,7 +11,7 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
@@ -20,13 +20,14 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class AdvancedFurnaceBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, Inventory, Tickable, SidedInventory {
+public class AdvancedFurnaceBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, Inventory, SidedInventory {
     private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);
     private int burnTime;
     private int fuelTime;
@@ -99,8 +100,8 @@ public class AdvancedFurnaceBlockEntity extends BlockEntity implements NamedScre
         }
     };
 
-    public AdvancedFurnaceBlockEntity() {
-        super(AdvancedFurnace.ADVANCED_FURNACE_BLOCK_ENTITY);
+    public AdvancedFurnaceBlockEntity(BlockPos pos, BlockState state) {
+        super(AdvancedFurnace.ADVANCED_FURNACE_BLOCK_ENTITY, pos, state);
     }
 
     @Override
@@ -168,89 +169,88 @@ public class AdvancedFurnaceBlockEntity extends BlockEntity implements NamedScre
     }
 
     @Override
-    public void fromTag(BlockState state, CompoundTag tag) {
-        super.fromTag(state, tag);
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        Inventories.fromTag(tag, this.inventory);
-        this.burnTime = tag.getShort("BurnTime");
-        this.cookTime = tag.getIntArray("CookTime");
-        this.cookTimeTotal = tag.getIntArray("CookTimeTotal");
+        Inventories.readNbt(nbt, this.inventory);
+        this.burnTime = nbt.getShort("BurnTime");
+        this.cookTime = nbt.getIntArray("CookTime");
+        this.cookTimeTotal = nbt.getIntArray("CookTimeTotal");
         this.fuelTime = this.getFuelTime((ItemStack)this.inventory.get(1));
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        super.toTag(tag);
-        tag.putShort("BurnTime", (short)this.burnTime);
-        tag.putIntArray("CookTime", this.cookTime);
-        tag.putIntArray("CookTimeTotal", this.cookTimeTotal);
-        Inventories.toTag(tag, this.inventory);
-        return tag;
+    public NbtCompound writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.putShort("BurnTime", (short)this.burnTime);
+        nbt.putIntArray("CookTime", this.cookTime);
+        nbt.putIntArray("CookTimeTotal", this.cookTimeTotal);
+        Inventories.writeNbt(nbt, this.inventory);
+        return nbt;
     }
 
     private boolean isBurning() {
         return this.burnTime > 0;
     }
 
-    @Override
-    public void tick() {
-        boolean bl = this.isBurning();
+    public static void tick(World world, BlockPos pos, BlockState state, AdvancedFurnaceBlockEntity be) {
+        boolean bl = be.isBurning();
         boolean bl2 = false;
-        if (this.isBurning()) {
-            this.burnTime -= 4;
+        if (be.isBurning()) {
+            be.burnTime -= 4;
         }
 
-        if (!this.world.isClient) {
-            ItemStack itemStack = (ItemStack)this.inventory.get(0);
-            if (!this.isBurning() && (itemStack.isEmpty() || ((ItemStack)this.inventory.get(0)).isEmpty())) {
+        if (!world.isClient) {
+            ItemStack itemStack = (ItemStack)be.inventory.get(0);
+            if (!be.isBurning() && (itemStack.isEmpty() || ((ItemStack)be.inventory.get(0)).isEmpty())) {
                 for (int i = 0; i < 4; i++) {
-                    if (!this.isBurning() && this.cookTime[i] > 0) {
-                        this.cookTime[i] = MathHelper.clamp(this.cookTime[i] - 2, 0, this.cookTimeTotal[i]);
+                    if (!be.isBurning() && be.cookTime[i] > 0) {
+                        be.cookTime[i] = MathHelper.clamp(be.cookTime[i] - 2, 0, be.cookTimeTotal[i]);
                     }
                 }
             } else {
                 for (int i = 0; i < 4; i++) {
                     Inventory tempInventory = new SimpleInventory(3);
-                    tempInventory.setStack(0, inventory.get(1+i*2));
-                    Recipe<?> recipe = this.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, tempInventory, this.world).orElse(null);
+                    tempInventory.setStack(0, be.inventory.get(1+i*2));
+                    Recipe<?> recipe = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, tempInventory, world).orElse(null);
 
-                    if (!this.isBurning() && this.canAcceptRecipeOutput(recipe, i)) {
-                        this.burnTime = this.getFuelTime(itemStack);
-                        this.fuelTime = this.burnTime;
-                        if (this.isBurning()) {
+                    if (!be.isBurning() && be.canAcceptRecipeOutput(recipe, i)) {
+                        be.burnTime = be.getFuelTime(itemStack);
+                        be.fuelTime = be.burnTime;
+                        if (be.isBurning()) {
                             bl2 = true;
                             if (!itemStack.isEmpty()) {
                                 Item item = itemStack.getItem();
                                 itemStack.decrement(1);
                                 if (itemStack.isEmpty()) {
                                     Item item2 = item.getRecipeRemainder();
-                                    this.inventory.set(0, item2 == null ? ItemStack.EMPTY : new ItemStack(item2));
+                                    be.inventory.set(0, item2 == null ? ItemStack.EMPTY : new ItemStack(item2));
                                 }
                             }
                         }
                     }
 
-                    if (this.isBurning() && this.canAcceptRecipeOutput(recipe, i)) {
-                        this.cookTime[i] += 2;
-                        this.cookTimeTotal[i] = this.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, tempInventory, this.world).map(AbstractCookingRecipe::getCookTime).orElse(200);
-                        if (this.cookTime[i] == this.cookTimeTotal[i]) {
-                            this.cookTime[i] = 0;
-                            this.cookTimeTotal[i] = this.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, tempInventory, this.world).map(AbstractCookingRecipe::getCookTime).orElse(200);
-                            this.craftRecipe(recipe, i);
+                    if (be.isBurning() && be.canAcceptRecipeOutput(recipe, i)) {
+                        be.cookTime[i] += 2;
+                        be.cookTimeTotal[i] = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, tempInventory, world).map(AbstractCookingRecipe::getCookTime).orElse(200);
+                        if (be.cookTime[i] == be.cookTimeTotal[i]) {
+                            be.cookTime[i] = 0;
+                            be.cookTimeTotal[i] = be.world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, tempInventory, be.world).map(AbstractCookingRecipe::getCookTime).orElse(200);
+                            be.craftRecipe(recipe, i);
                             bl2 = true;
                         }
                     } else {
-                        this.cookTime[i] = 0;
+                        be.cookTime[i] = 0;
                     }
                 }
             }
-            if (bl != this.isBurning()) {
+            if (bl != be.isBurning()) {
                 bl2 = true;
-                this.world.setBlockState(this.pos, (BlockState)this.world.getBlockState(this.pos).with(AdvancedFurnaceBlock.LIT, this.isBurning()), 3);
+                world.setBlockState(be.pos, (BlockState)world.getBlockState(be.pos).with(AdvancedFurnaceBlock.LIT, be.isBurning()), 3);
             }
         }
         if (bl2) {
-            this.markDirty();
+            be.markDirty();
         }
     }
 
