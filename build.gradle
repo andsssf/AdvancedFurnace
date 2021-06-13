@@ -1,6 +1,8 @@
 plugins {
 	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
+	// Publishing mod on Modrinth using Minotaur
+	id "com.modrinth.minotaur" version "1.2.1"
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
@@ -39,6 +41,18 @@ tasks.withType(JavaCompile).configureEach {
 
 	// Minecraft 1.17 (21w19a) upwards uses Java 16.
 	it.options.release = 16
+}
+
+import com.modrinth.minotaur.TaskModrinthUpload
+
+task publishModrinth (type: TaskModrinthUpload) {
+	setGroup('publishing')
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = 'e3RoZUwe'
+	versionNumber = '${project.version}-fabric'
+	uploadFile = remapJar
+	addGameVersion('1.17')
+	addLoader('fabric')
 }
 
 java {
