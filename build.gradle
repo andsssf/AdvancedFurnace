@@ -49,7 +49,8 @@ task publishModrinth (type: TaskModrinthUpload) {
 	setGroup('publishing')
 	token = System.getenv("MODRINTH_TOKEN")
 	projectId = 'e3RoZUwe'
-	versionNumber = '${project.version}-fabric'
+	versionNumber = project.version
+	versionName = project.archives_base_name + "-" + project.version
 	uploadFile = remapJar
 	addGameVersion('1.17')
 	addLoader('fabric')

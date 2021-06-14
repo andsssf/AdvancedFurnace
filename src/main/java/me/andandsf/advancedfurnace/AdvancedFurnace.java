@@ -6,11 +6,13 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +36,7 @@ public class AdvancedFurnace implements ModInitializer {
 
 
 	static {
-		ADVANCED_FURNACE_BLOCK = Registry.register(Registry.BLOCK, ADVANCED_FURNACE_ID, new AdvancedFurnaceBlock(FabricBlockSettings.copyOf(Blocks.FURNACE)));
+		ADVANCED_FURNACE_BLOCK = Registry.register(Registry.BLOCK, ADVANCED_FURNACE_ID, new AdvancedFurnaceBlock(FabricBlockSettings.of(Material.STONE).requiresTool().strength(3.5f).luminance((state) -> (Boolean)state.get(Properties.LIT) ? 13 : 0)));
 		ADVANCED_FURNACE_ITEM = Registry.register(Registry.ITEM, ADVANCED_FURNACE_ID, new BlockItem(ADVANCED_FURNACE_BLOCK, new Item.Settings().group(ItemGroup.MISC)));
 		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "update_tool"), UPDATE_TOOL_ITEM);
 
