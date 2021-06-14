@@ -1,4 +1,4 @@
 # AdvancedFurnace
 minecraft mod
 
-![download](https://modrinth.com/mod/advancedfurnace/versions)
+[download](https://modrinth.com/mod/advancedfurnace/versions)
