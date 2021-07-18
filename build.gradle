@@ -53,6 +53,7 @@ task publishModrinth (type: TaskModrinthUpload) {
 	versionName = project.archives_base_name + "-" + project.version
 	uploadFile = remapJar
 	addGameVersion('1.17')
+	addGameVersion('1.17.1')
 	addLoader('fabric')
 }
 
