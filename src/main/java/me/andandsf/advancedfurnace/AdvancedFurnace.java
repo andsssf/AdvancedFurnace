@@ -36,7 +36,7 @@ public class AdvancedFurnace implements ModInitializer {
 
 
 	static {
-		ADVANCED_FURNACE_BLOCK = Registry.register(Registry.BLOCK, ADVANCED_FURNACE_ID, new AdvancedFurnaceBlock(FabricBlockSettings.copyOf(Blocks.FURNACE).breakByTool(FabricToolTags.PICKAXES, 0)));
+		ADVANCED_FURNACE_BLOCK = Registry.register(Registry.BLOCK, ADVANCED_FURNACE_ID, new AdvancedFurnaceBlock(FabricBlockSettings.copyOf(Blocks.FURNACE).requiresTool()));
 		ADVANCED_FURNACE_ITEM = Registry.register(Registry.ITEM, ADVANCED_FURNACE_ID, new BlockItem(ADVANCED_FURNACE_BLOCK, new Item.Settings().group(ItemGroup.MISC)));
 		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "update_tool"), UPDATE_TOOL_ITEM);
 

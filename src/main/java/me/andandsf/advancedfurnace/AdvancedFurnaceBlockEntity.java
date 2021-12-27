@@ -180,13 +180,12 @@ public class AdvancedFurnaceBlockEntity extends BlockEntity implements NamedScre
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
+    public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
         nbt.putShort("BurnTime", (short)this.burnTime);
         nbt.putIntArray("CookTime", this.cookTime);
         nbt.putIntArray("CookTimeTotal", this.cookTimeTotal);
         Inventories.writeNbt(nbt, this.inventory);
-        return nbt;
     }
 
     private boolean isBurning() {
